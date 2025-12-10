@@ -12,7 +12,7 @@ on:
       GOOGLE_CREDENTIALS:
         required: true
       GH_TOKEN:
-        required: true
+        required: false
 
 jobs:
   terraform:
@@ -146,3 +146,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           TF_VAR_github_token: ${{ secrets.GH_TOKEN }}
           GITHUB_OWNER: gouv-nc-data
+          
