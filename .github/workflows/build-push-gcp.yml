@@ -3,10 +3,8 @@ name: Build and Push Docker Image
 on:
   workflow_call:
     secrets:
-      GOOGLE_CREDENTIALS:
-        required: false
-      GH_TOKEN:
-        required: false
+      GCP_CREDENTIALS:
+        required: true 
 
 env:
   IMAGE_NAME: ${{ vars.GCR_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.GCP_REPO_NAME }}/${{ github.event.repository.name }}
