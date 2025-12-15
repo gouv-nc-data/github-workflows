@@ -9,11 +9,6 @@ on:
         required: false
         type: string
         default: "."
-    secrets:
-      GOOGLE_CREDENTIALS:
-        required: true
-      GH_TOKEN:
-        required: false
 
 jobs:
   docs:

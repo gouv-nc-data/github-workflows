@@ -4,7 +4,7 @@ on:
   workflow_call:
     secrets:
       GCP_CREDENTIALS:
-        required: true 
+        required: true
 
 env:
   IMAGE_NAME: ${{ vars.GCR_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.GCP_REPO_NAME }}/${{ github.event.repository.name }}
