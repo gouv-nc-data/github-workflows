@@ -7,7 +7,8 @@ on:
         required: true
 
 env:
-  IMAGE_NAME: ${{ vars.GCR_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.GCP_REPO_NAME }}/${{ github.event.repository.name }}
+  # Prefix GAR: <region>-docker.pkg.dev/<project>/<repo>
+  GAR_PREFIX: ${{ vars.GCR_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.GCP_REPO_NAME }}
 
 jobs:
   build-and-push:
@@ -15,10 +16,16 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write # utile/nécessaire si tu passes en Workload Identity Federation
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # Repo name du caller (robuste pour reusable workflows)
+      - name: Compute image name
+        run: |
+          echo "IMAGE_NAME=${GAR_PREFIX}/${GITHUB_REPOSITORY##*/}" >> "$GITHUB_ENV"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -28,9 +35,12 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
+      - name: Set up gcloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
       - name: Configure Docker for Google Artifact Registry
         run: |
-          gcloud auth configure-docker ${{ vars.GCR_REGION }}-docker.pkg.dev
+          gcloud auth configure-docker ${{ vars.GCR_REGION }}-docker.pkg.dev --quiet
 
       - name: Extract metadata
         id: meta
