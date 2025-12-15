@@ -1,0 +1,33 @@
+name: Generate terraform docs
+
+
+on:
+  workflow_call:
+    inputs:
+      tf_working_dir:
+        description: "Terraform working directory"
+        required: false
+        type: string
+        default: "."
+    secrets:
+      GOOGLE_CREDENTIALS:
+        required: true
+      GH_TOKEN:
+        required: false
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+        with:
+            ref: main
+
+      - name: Render terraform docs inside the README.md and push changes
+        uses: terraform-docs/gh-actions@v1.3.0
+        with:
+            working-dir: .
+            output-file: README.md
+            output-method: inject
+            git-push: "true"
