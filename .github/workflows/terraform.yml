@@ -61,7 +61,7 @@ jobs:
         id: plan
         if: github.event_name == 'pull_request'
         working-directory: ${{ inputs.tf_working_dir }}
-        run: terraform plan -no-color
+        run: terraform plan -no-color | tee plan.out
         continue-on-error: true
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
@@ -69,11 +69,11 @@ jobs:
           TF_VAR_github_token: ${{ secrets.GH_TOKEN }}
           GITHUB_OWNER: gouv-nc-data
 
-      - name: Echo plan output to a file
-        if: github.event_name == 'pull_request'
-        working-directory: ${{ inputs.tf_working_dir }}
-        run: |
-          echo "${{ steps.plan.outputs.stdout }}" > plan.out
+#      - name: Echo plan output to a file
+#        if: github.event_name == 'pull_request'
+#        working-directory: ${{ inputs.tf_working_dir }}
+#        run: |
+#          echo "${{ steps.plan.outputs.stdout }}" > plan.out
 
       - uses: actions/github-script@v6
         id: format_pr
