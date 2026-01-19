@@ -1,4 +1,4 @@
-name: Deploy to Cloud Run from Source
+name: Deploy to Cloud Run Job from Source
 
 on:
   workflow_call:
@@ -42,7 +42,7 @@ jobs:
 
       - name: Configure Docker for Google Artifact Registry
         run: |
-          gcloud auth configure-docker ${{ vars.GCR_REGION }}-docker.pkg.dev --quiet
+          gcloud auth configure-docker ${{ vars.GCP_REGION }}-docker.pkg.dev --quiet
 
       - name: Extract metadata
         id: meta
