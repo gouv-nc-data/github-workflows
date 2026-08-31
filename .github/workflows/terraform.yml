@@ -78,11 +78,21 @@ jobs:
       - uses: actions/github-script@v6
         id: format_pr
         if: github.event_name == 'pull_request'
+        env:
+          # Passées par l'environnement et non interpolées dans `script:` :
+          # une substitution ${{ }} colle le texte dans le source JS avant
+          # qu'il soit parsé, donc toute sortie contenant ${...} ou un
+          # backtick casse le script (voire y injecte du code).
+          VALIDATE_OUT: ${{ steps.validate.outputs.stdout }}
+          TF_WORKING_DIR: ${{ inputs.tf_working_dir }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs')
-            const plan_file = fs.readFileSync('plan.out', 'utf8')
+            const path = require('path')
+            const validate_out = process.env.VALIDATE_OUT || ''
+            const plan_path = path.join(process.env.TF_WORKING_DIR || '.', 'plan.out')
+            const plan_file = fs.existsSync(plan_path) ? fs.readFileSync(plan_path, 'utf8') : ''
             const plan = plan_file.length > 55000 ? plan_file.toString().substring(plan_file.length - 60000) + " ..." : plan_file
 
             const { data: comments } = await github.rest.issues.listComments({
@@ -100,7 +110,7 @@ jobs:
             <details><summary>Validation Output</summary>
 
             \`\`\`\n
-            ${{ steps.validate.outputs.stdout }}
+            ${validate_out}
             \`\`\`
 
             </details>
@@ -146,4 +156,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           TF_VAR_github_token: ${{ secrets.GH_TOKEN }}
           GITHUB_OWNER: gouv-nc-data
-          
