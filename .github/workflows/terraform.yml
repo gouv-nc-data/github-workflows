@@ -61,7 +61,10 @@ jobs:
         id: plan
         if: github.event_name == 'pull_request'
         working-directory: ${{ inputs.tf_working_dir }}
-        run: terraform plan -no-color | tee plan.out
+        # shell: bash active pipefail : sans lui, le code retour est celui de tee
+        # et un plan en erreur passe pour un succès.
+        shell: bash
+        run: terraform plan -no-color 2>&1 | tee plan.out
         continue-on-error: true
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
